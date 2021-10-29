@@ -110,7 +110,7 @@ int main (int argc, char *argv[]){
                     printf("O nodo %d testa o nodo %d CORRETO no tempo %3.1f.\n", token, next, time());
                 }
                 else{
-                    printf("O nodo %d testa não encontrou nenhum outro nodo correto no tempo %3.1f.\n", token, time());
+                    printf("O nodo %d não encontrou nenhum outro nodo correto no tempo %3.1f.\n", token, time());
                 }
 
                 schedule(TEST, 30.0, token);
