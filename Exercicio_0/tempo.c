@@ -97,6 +97,7 @@ int main (int argc, char *argv[]){
         }
     }
 
+    free(nodo);
     exit(0);
 }
 
