@@ -83,7 +83,7 @@ int main (int argc, char *argv[]){
                 if (status(nodo[token].id) != 0)    
                     break; 
                 
-                printf("O nodo %d vai testar no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] vai testar.\n", time(), token);
                 schedule(TEST, 30.0, token);
                 break;
 
@@ -93,12 +93,12 @@ int main (int argc, char *argv[]){
                     puts("Não foi possível falhar o nodo...");
                     break;
                 }
-                printf("O nodo %d falhou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] falhou.\n", time(), token);
                 break;
 
             case REPAIR:
                 release(nodo[token].id, token);
-                printf("O nodo %d recuperou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] recuperou.\n", time(), token);
                 schedule(TEST, 30.0, token);
                 break;
         }

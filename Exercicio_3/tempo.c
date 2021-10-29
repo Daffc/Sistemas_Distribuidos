@@ -109,7 +109,7 @@ int main (int argc, char *argv[]){
                 while(status(nodo[next].id) && (next != token)){
 
                     // Imprime que nodo 'next' esta FALHO.
-                    printf("O nodo %d testa o nodo %d FALHO no tempo %3.1f.\n", token, next, time());
+                    printf("[%3.1f] O nodo [%d] testa o nodo [%d] FALHO.\n", time(), token, next);
 
                     // Calcula id nodo próximo a 'next' e atualiza entrada de state de nodo 'next'.
                     next = (next + 1) % N;
@@ -117,14 +117,14 @@ int main (int argc, char *argv[]){
                 }
 
                 if(next != token){
-                    printf("O nodo %d testa o nodo %d CORRETO no tempo %3.1f.\n", token, next, time());
+                    printf("[%3.1f] O nodo [%d] testa o nodo [%d] CORRETO.\n", time(), token, next);
                 }
                 else{
-                    printf("O nodo %d não encontrou nenhum outro nodo correto no tempo %3.1f.\n", token, time());
+                    printf("[%3.1f] O nodo [%d] não encontrou nenhum outro nodo correto.\n", time(), token);
                 }
 
                 // Imprime vetor 'state' de nodo 'token'.
-                printf("Vetor 'state' de nodo %d em tempo %3.1f:\n", token, time());
+                printf("\tVetor 'state' de nodo [%d]:\n", token);
                 printf("\t");
                 for(i = 0; i < N; i++){
                     printf("[%d] = %d; ", i, nodo[token].state[i]);
@@ -140,12 +140,12 @@ int main (int argc, char *argv[]){
                     puts("Não foi possível falhar o nodo...");
                     break;
                 }
-                printf("O nodo %d falhou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] falhou.\n", time(), token);
                 break;
 
             case REPAIR:
                 release(nodo[token].id, token);
-                printf("O nodo %d recuperou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] recuperou.\n", time(), token);
                 schedule(TEST, 30.0, token);
                 break;
         }

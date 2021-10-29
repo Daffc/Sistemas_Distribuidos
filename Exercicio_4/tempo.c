@@ -35,7 +35,7 @@ int main (int argc, char *argv[]){
     static int  N,              // Número total de processos, recebido por linha de comando.
                 token,          // O processo que "está executando" em um instante de tempo.
                 event,          // Evento.
-                node_counter,   // Utilizado para contar a quantiadade de nodos testados por um node durante uma rodada.
+                nodo_counter,   // Utilizado para contar a quantiadade de nodos testados por um nodo durante uma rodada.
                 r,
                 i,
                 j,
@@ -101,16 +101,16 @@ int main (int argc, char *argv[]){
                 next = (token + 1) % N;
                 
                 // Zera a contagem de nodos testados. 
-                node_counter = 0;
+                nodo_counter = 0;
 
                 // Equanto nodo indicado por 'next' não estiver correto e não for o nodo atual (token)
                 while(status(nodo[next].id) && (next != token)){
 
                     // incrementa o contador de nodos testados.
-                    node_counter ++;
+                    nodo_counter ++;
 
                     // Imprime que nodo 'next' esta FALHO.
-                    printf("O nodo %d testa o nodo %d FALHO no tempo %3.1f.\n", token, next, time());
+                    printf("[%3.1f] O nodo [%d] testa o nodo [%d] FALHO.\n", time(), token, next);
 
                     // Caso anteriormente nodo 'next' estivesse CORRETO, incrementar a sua entrada em vetor 'state'.
                     if((nodo[token].state[next] % 2) == 0){
@@ -122,28 +122,29 @@ int main (int argc, char *argv[]){
                     nodo[token].state[next] = status(nodo[next].id);
                 }
 
+                // Caso 'next' indique um nodo correto diferente de nodo testador (token ).
                 if(next != token){
-                    printf("O nodo %d testa o nodo %d CORRETO no tempo %3.1f.\n", token, next, time());
+                    printf("[%3.1f] O nodo [%d] testa o nodo [%d] CORRETO.\n", time(), token, next);
 
                     // Caso anteriormente nodo 'next' estivesse FALHO, incrementar a sua entrada em vetor 'state'.
                     if((nodo[token].state[next] % 2) == 1){
                         nodo[token].state[next] += 1;
                     }
-                    node_counter ++;
+                    nodo_counter ++;
                     
-                    // Transferindo nodos não testados ( N - node_counter ) a partir de nodo 'next', de vetor 'state' de nodo 'next' para 'state' de nodo 'token'.
-                    for(i = 1; i < (N - node_counter); i++){
+                    // Transferindo nodos não testados ( N - nodo_counter ) a partir de nodo 'next', de vetor 'state' de nodo 'next' para 'state' de nodo 'token'.
+                    for(i = 1; i < (N - nodo_counter); i++){
 
-                        printf("\tRecuperando estado de node [%d] de vector state de node %d.\n", (next + i) % N, next);
+                        printf("\tRecuperando estado de nodo [%d] de vector state de nodo [%d].\n", (next + i) % N, next);
                         nodo[token].state[(next + i) % N] = nodo[next].state[(next + i) % N];
                     }
                 }
                 else{
-                    printf("O nodo %d não encontrou nenhum outro nodo correto no tempo %3.1f.\n", token, time());
+                    printf("[%3.1f] O nodo [%d] não encontrou nenhum outro nodo correto.\n", time(), token);
                 }
 
                 // Imprime vetor 'state' de nodo 'token'.
-                printf("\tVetor 'state' de nodo %d em tempo %3.1f:\n", token, time());
+                printf("\tVetor 'state' de nodo [%d]:\n", token);
                 printf("\t");
                 for(i = 0; i < N; i++){
                     printf("[%d] = %d; ", i, nodo[token].state[i]);
@@ -159,12 +160,12 @@ int main (int argc, char *argv[]){
                     puts("Não foi possível falhar o nodo...");
                     break;
                 }
-                printf("O nodo %d falhou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] falhou.\n", time(), token);
                 break;
 
             case REPAIR:
                 release(nodo[token].id, token);
-                printf("O nodo %d recuperou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] recuperou.\n", time(), token);
                 schedule(TEST, 30.0, token);
                 break;
         }

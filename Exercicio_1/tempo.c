@@ -45,7 +45,7 @@ int main (int argc, char *argv[]){
 
     // Imprimindo header de log.
     printf(
-        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 1.\n"
+        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa .\n"
         "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
         "Este Programa foi executado com N=%d Processos.\n",
         N
@@ -90,10 +90,10 @@ int main (int argc, char *argv[]){
 
                 // Verifica se state de processo 'next', imprimindo teste e resultado (FALHO ou CORRETO) em log o resultado.
                 if(status(nodo[next].id) != 0){
-                    printf("O nodo %d testa o nodo %d FALHO no tempo %3.1f.\n", token, next, time());
+                    printf("[%3.1f] O nodo [%d] testa o nodo [%d] FALHO.\n", time(), token, next);
                 }
                 else{
-                    printf("O nodo %d testa o nodo %d CORRETO no tempo %3.1f.\n", token, next, time());
+                    printf("[%3.1f] O nodo [%d] testa o nodo [%d] CORRETO.\n", time(), token, next);
                 }
                 schedule(TEST, 30.0, token);
                 break;
@@ -104,12 +104,12 @@ int main (int argc, char *argv[]){
                     puts("Não foi possível falhar o nodo...");
                     break;
                 }
-                printf("O nodo %d falhou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] falhou.\n", time(), token);
                 break;
 
             case REPAIR:
                 release(nodo[token].id, token);
-                printf("O nodo %d recuperou no tempo %3.1f.\n", token, time());
+                printf("[%3.1f] O nodo [%d] recuperou.\n", time(), token);
                 schedule(TEST, 30.0, token);
                 break;
         }
