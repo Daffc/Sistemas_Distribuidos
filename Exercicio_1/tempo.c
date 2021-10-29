@@ -81,7 +81,11 @@ int main (int argc, char *argv[]){
                 // Calcula id de nodo que será testado por nodo atual.
                 next = (token + 1) % N;
 
+<<<<<<< HEAD
                 // Verifica se state de processo 'next', imprimindo teste e resultado (FALHO ou CORRETO) em log o resultado.
+=======
+                // Verifica se processo state de processo 'next', imprimindo teste e resultado (FALHO ou CORRETO) em log o resultado.
+>>>>>>> 262dbc62424dde0830c44756e79de3b3b0e70bbf
                 if(status(nodo[next].id) != 0){
                     printf("O nodo %d testa o nodo %d FALHO no tempo %3.1f.\n", token, next, time());
                 }
