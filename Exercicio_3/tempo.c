@@ -151,6 +151,10 @@ int main (int argc, char *argv[]){
         }
     }
 
+    // Liberando memória alocada.
+    for(i = 0; i < N; i++){
+        free(nodo[i].state);
+    }
     free(nodo);
     exit(0);
 }
