@@ -2,7 +2,7 @@
     Programa: um exemplo para aprender simulação SMPL.
 
     Autor: Douglas Affonso Clementino
-    Data da última modificação: 25/10/2021
+    Data da última modificação: 29/10/2021
 */
 
 #include <stdio.h>
@@ -41,6 +41,13 @@ int main (int argc, char *argv[]){
 
     N = atoi(argv[1]);      // Recuperando quantidade de nodos da entrada de argumentos.
 
+    // Imprimindo header de log.
+    printf(
+        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 0.\n"
+        "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
+        "Este Programa foi executado com N=%d Processos.\n",
+        N
+    );
 
     smpl(0, "Um exemplo de simulação"); // Definindo Identificado para simulação.
     reset();                            // Iniciando / reinicinado simulação.
