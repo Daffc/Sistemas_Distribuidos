@@ -96,12 +96,11 @@ int main (int argc, char *argv[]){
                 // Calcula id de primeiro nodo que será testado por nodo atual.
                 next = (token + 1) % N;
 
+                // Equanto nodo indicado por 'next' não estiver correto e não for o nodo atual (token)
                 while(status(nodo[next].id) && (next != token)){
 
-                    // Verifica se state de processo 'next', imprimindo teste e resultado (FALHO ou CORRETO) em log o resultado.
-                    if(status(nodo[next].id) != 0){
-                        printf("O nodo %d testa o nodo %d FALHO no tempo %3.1f.\n", token, next, time());
-                    }
+                    // Imprime que nodo 'next' esta FALHO.
+                    printf("O nodo %d testa o nodo %d FALHO no tempo %3.1f.\n", token, next, time());
 
                     // Calcula id nodo próximo a 'next'.
                     next = (next + 1) % N;
