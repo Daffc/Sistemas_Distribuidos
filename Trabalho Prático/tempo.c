@@ -61,7 +61,7 @@ tnodo *nodo;
 
 // Atualiza entrada de vector state de nodo 'n_testador' na lista 'nodo' com informações referentes a nodo 'n_testado', levando em consideração 
 // o estado de 'n_testado' (CORRETO ou FALHO) e a comparação de entradas de ambos os vector states.  
-void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qtn_nodos){
+void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
     int i;
 
     // Caso nodo 'n_testado' esteja correto.
@@ -75,7 +75,7 @@ void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qtn_nod
             nodo[n_testador].state[n_testado] += 1;
 
         // Comparando Voctor States de nodos 'n_testador' e 'n_testado' e atualizando 'n_testador'.
-        for(i = 0; i < qtn_nodos; i++){
+        for(i = 0; i < qnt_nodos; i++){
             // Caso 'i' seja diferente dos nodos envolvidos.
             if((i != n_testador) && (i != n_testado)){
                 // Caso entrada 'i' de vector state de nodo 'n_testador' tenha valor menor (desatualizado) comparado a entrada 'i' de vector state de nodo 'n_testado', 
@@ -99,16 +99,32 @@ void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qtn_nod
     }
 }
 
+// Imprime Vector State de 'nodo[id]'
 void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
     int i;
 
-    printf("\tVector State de nodo [%d]:\n", id);
-    
-    printf("\t\t [%d] = ", id);
+    printf("\t\tVector State de nodo [%d]: ", id);
     for(i = 0; i < qnt_nodos; i++){
-        printf("[%d]:%d; ", i, nodo[id].state[i]);
+        printf("[%d] = %d; ", i, nodo[id].state[i]);
     }
     printf("\n");
+}
+
+void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
+    
+    // Atualizando vector state de nodo 'n_testador' de acordo com o estado e com o vector state de 'n_testado'.
+    atualizaVectorState(nodo, n_testador, n_testado, qnt_nodos);
+
+    // Caso nodo 'n_testado' esteja CORRETO.
+    if(status(nodo[n_testado].id) == 0){
+        printf("\tNodo [%d] testa o nodo [%d] CORRETO.\n", n_testador, n_testado);
+        imprimeVectorState(nodo, n_testador, qnt_nodos);
+    }
+    // Caso nodo 'n_testado' esteja FALHO.
+    else{
+        printf("\tNodo [%d] testa o nodo [%d] FALHO.\n", n_testador, n_testado);
+    }
+
 }
 
 int main (int argc, char *argv[]){
@@ -173,14 +189,8 @@ int main (int argc, char *argv[]){
         schedule(TEST, 30.0, i);
     }
 
-    // schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
-    // schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
-
-    // // Escalonando todos os nodos, exceto o nodo 0 para falharem em tempo 40 até 70.
-    // for(i = 1; i < N; i++){
-    //     schedule(FAULT, 40.0, i);   
-    //     schedule(REPAIR, 70.0, i);
-    // }
+    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
+    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
 
 
 
@@ -192,23 +202,37 @@ int main (int argc, char *argv[]){
 
             case TEST:
 
-                // Calcula id de primeiro nodo que será testará por nodo atual (token) e atualiza entrada de state de nodo 'next'.       
-                printf("[%3.1f] O nodo [%d] é testado por:\n", time(), token);
-                for(s = 1; s <= qtn_cluster; s++){
-                    qtn_nodos = cisj(token, s, -1, testador);
+                // Caso o testador estiver falho, sair.
+                if (status(nodo[token].id) != 0)    
+                    break; 
 
-                    // Percorre todos os nodos de cluster
-                    for(i=0; i < qtn_nodos; i++){
-                        // Verifica se identificador de nodo é válido (Casoso em que N não é uma potência de 2).
-                        if(testador[i] < N){
-                            // Busca primeiro nodo de cluster sem falha (testador);
-                            if(status(nodo[testador[i]].id) == 0){
-                                printf("\tc(%d, %d): %d\n", token, s, testador[i]);
+                printf("[%3.1f] O nodo [%d] inica testes:\n", time(), token);
+
+                // Para cada cluster 's' de todos os N nodos.
+                for (s = 1; s <= qtn_cluster; s++){
+
+                    // intera sobre todos os 'N' nodos.
+                    for(i = 0; i < N; i++){
+
+                        // Caso nodo 'i' seja diferente de token (não se auto-testar).
+                        if(i != token){
+
+                            // Recupere lista ordenada de testadores de nodo 'i' em cluster 's' (função cis).
+                            qtn_nodos = cisj(i, s, -1, testador);
+
+                            // Percorre todos os possíveis testadores de nodo 'i' em ordem de função cij.                         
+                            for(j = 0; j < qtn_nodos; j++){
                                 
-                                // Atualiza vector state de nodo 'testador[i]' com informações de nodo 'token'.
-                                atualizaVectorState(nodo, testador[i], token, N);
-                                imprimeVectorState(nodo, testador[i], N);
-                                break;
+                                // Verifica se nodo testador[j] existe (casos em que N não é potência de 2) e se este está correto.
+                                if((testador[j] < N) && (status(nodo[testador[j]].id) == 0)){
+
+                                    // Verifica se primeiro nodo válido e correto encontrado é o nodo 'token'.                                    
+                                    if(testador[j] == token){
+                                        testarNodo(nodo, token, i, N);
+                                    }
+                                    // Nodo correto encontrado, ecerrar loop sobre lista 'cis'.
+                                    break;
+                                }
                             }
                         }
                     }
