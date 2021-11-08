@@ -47,7 +47,69 @@ typedef struct{
     int *state;
 } tnodo;
 
+typedef struct{
+    int nodo;       // ID de Nodo que sofreu o evento.
+    int type;       // Tipo de Evento que esta sendo gerenciado
+    int r_inicio;   // Rodada em que evento foi sofrido.
+    int r_fim;      // Rodada em que evento foi diagnosticado.
+    real t_inicio;  // Tempo em que eveto foi sofrido.
+    real t_fim;     // Tempo em que evendo foi diagnosticado.
+    int *aletados;  // Vetor que lista todos os nodos que estão cientes de evento, (utilizado para verificar se evento foi diagnosticado).
+} evento;
+
 tnodo *nodo;
+
+// Atualiza entrada de vector state de nodo 'n_testador' na lista 'nodo' com informações referentes a nodo 'n_testado', levando em consideração 
+// o estado de 'n_testado' (CORRETO ou FALHO) e a comparação de entradas de ambos os vector states.  
+void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qtn_nodos){
+    int i;
+
+    // Caso nodo 'n_testado' esteja correto.
+    if(status(nodo[n_testado].id) == 0){
+        // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
+        if(nodo[n_testador].state[n_testado] == -1)
+            nodo[n_testador].state[n_testado] = 0;
+        
+        // Caso nodo 'n_testado' conste como FALHO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
+        if(nodo[n_testador].state[n_testado] % 2 == 1)
+            nodo[n_testador].state[n_testado] += 1;
+
+        // Comparando Voctor States de nodos 'n_testador' e 'n_testado' e atualizando 'n_testador'.
+        for(i = 0; i < qtn_nodos; i++){
+            // Caso 'i' seja diferente dos nodos envolvidos.
+            if((i != n_testador) && (i != n_testado)){
+                // Caso entrada 'i' de vector state de nodo 'n_testador' tenha valor menor (desatualizado) comparado a entrada 'i' de vector state de nodo 'n_testado', 
+                // atualizar entrada 'i' vector state de nodo 'n_testador' com entrada 'i' de vector state de nodo 'n_testado'.
+                if (nodo[n_testador].state[i] < nodo[n_testado].state[i])
+                    nodo[n_testador].state[i] = nodo[n_testado].state[i];
+            }
+        }
+    }
+        
+    // Caso nodo 'n_testado' esteja falho.
+    else{
+        // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
+        if(nodo[n_testador].state[n_testado] == -1)
+            nodo[n_testador].state[n_testado] = 1;
+        
+        // Caso nodo 'n_testado' conste como CORRETO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
+        if(nodo[n_testador].state[n_testado] % 2 == 0)
+            nodo[n_testador].state[n_testado] += 1;
+        
+    }
+}
+
+void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
+    int i;
+
+    printf("\tVector State de nodo [%d]:\n", id);
+    
+    printf("\t\t [%d] = ", id);
+    for(i = 0; i < qnt_nodos; i++){
+        printf("[%d]:%d; ", i, nodo[id].state[i]);
+    }
+    printf("\n");
+}
 
 int main (int argc, char *argv[]){
     static int  N,          // Número total de processos, recebido por linha de comando.
@@ -60,7 +122,7 @@ int main (int argc, char *argv[]){
                 next,
                 qtn_cluster,
                 qtn_nodos,
-                *tests;
+                *testador;
 
     static char fa_name[5];  // Nome da facility.
 
@@ -83,7 +145,7 @@ int main (int argc, char *argv[]){
     qtn_cluster = log2(N) + 1;
 
     // Armazenando vetor de para retorno da função cisj.
-    tests = (int *) malloc ((N / 2) * sizeof(int));
+    testador = (int *) malloc ((N / 2) * sizeof(int));
 
     smpl(0, "Um exemplo de simulação"); // Definindo Identificado para simulação.
     reset();                            // Iniciando / reinicinado simulação.
@@ -111,6 +173,16 @@ int main (int argc, char *argv[]){
         schedule(TEST, 30.0, i);
     }
 
+    // schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
+    // schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+
+    // // Escalonando todos os nodos, exceto o nodo 0 para falharem em tempo 40 até 70.
+    // for(i = 1; i < N; i++){
+    //     schedule(FAULT, 40.0, i);   
+    //     schedule(REPAIR, 70.0, i);
+    // }
+
+
 
     // Loop de simulação.
     while(time() < T_SIMULACAO){
@@ -123,15 +195,19 @@ int main (int argc, char *argv[]){
                 // Calcula id de primeiro nodo que será testará por nodo atual (token) e atualiza entrada de state de nodo 'next'.       
                 printf("[%3.1f] O nodo [%d] é testado por:\n", time(), token);
                 for(s = 1; s <= qtn_cluster; s++){
-                    qtn_nodos = cisj(token, s, -1, tests);
+                    qtn_nodos = cisj(token, s, -1, testador);
 
                     // Percorre todos os nodos de cluster
                     for(i=0; i < qtn_nodos; i++){
                         // Verifica se identificador de nodo é válido (Casoso em que N não é uma potência de 2).
-                        if(tests[i] < N){
+                        if(testador[i] < N){
                             // Busca primeiro nodo de cluster sem falha (testador);
-                            if(status(nodo[tests[i]].id) == 0){
-                                printf("\t c(%d, %d): %d\n", token, s, tests[i]);
+                            if(status(nodo[testador[i]].id) == 0){
+                                printf("\tc(%d, %d): %d\n", token, s, testador[i]);
+                                
+                                // Atualiza vector state de nodo 'testador[i]' com informações de nodo 'token'.
+                                atualizaVectorState(nodo, testador[i], token, N);
+                                imprimeVectorState(nodo, testador[i], N);
                                 break;
                             }
                         }
@@ -163,6 +239,6 @@ int main (int argc, char *argv[]){
         free(nodo[i].state);
     }
     free(nodo);
-    free(tests);
+    free(testador);
     exit(0);
 }
