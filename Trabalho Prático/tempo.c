@@ -181,9 +181,35 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
 
 }
 
+// Define Agendamento de eventos da simualação.
 void agendarEventos(){
     schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
     schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+}
+
+// Imprime informações dos nodos antes de iniciar simulação.
+void imprimeInicializacao(tnodo *nodo, int qnt_nodos){
+    int i,
+        j;
+
+    printf("Definições Iniciais de nodos:\n");
+    for(i = 0; i < qnt_nodos; i++){
+        printf("\tNodo [%d]:\n", i);
+        printf("\t\tEstado: %d\n", status(nodo[i].id));
+
+        printf("\t\tVetor de Testes: {");
+        for(j = 0; j < nodo[i].qnt_testes - 1; j++){
+            printf("%d, ", nodo[i].testes[j]);
+        }
+        printf("%d}\n", nodo[i].testes[j]);
+
+        printf("\t\tVector State: {");
+        for(j = 0; j < qnt_nodos - 1; j++){
+            printf("%d, ", nodo[i].state[j]);
+        }
+        printf("%d}\n", nodo[i].state[j]);
+    }
+    printf("\n\n");
 }
 
 int main (int argc, char *argv[]){
@@ -211,7 +237,8 @@ int main (int argc, char *argv[]){
     printf(
         "Sistemas Distribuidos 2021/ERE4: TRABALHO PRÁTICO.\n"
         "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
-        "Este Programa foi executado com N=%d Processos.\n",
+        "Este Programa foi executado com N=%d Processos.\n"
+        "\n\n",
         N
     );
 
@@ -237,15 +264,19 @@ int main (int argc, char *argv[]){
         nodo[i].state[i] = 0;
     }
 
-    
+
     for(i = 0; i < N; i++){
         schedule(TEST, 30.0, i);    // Escalonando testes para todos os nodos executarem no tempo 30.
         defineTestes(nodo, i, N);   // Calculando os testes que cada um dos nodos deverá relaizar.
     }
 
+    // Imprime informações sobre inicialização da simulação.
+    imprimeInicializacao(nodo, N);
+
     // Função que agendará eventos que ocorrerão durante simuação.
     agendarEventos();
 
+    printf("====================== Incializando Simulação ======================\n");
     // Loop de simulação.
     while(time() < T_SIMULACAO){
         cause(&event, &token);
@@ -286,6 +317,7 @@ int main (int argc, char *argv[]){
         }
     }
 
+    printf("====================== Finalizando Simulação ======================\n");
     // Liberando memória alocada.
     for(i = 0; i < N; i++){
         free(nodo[i].state);
