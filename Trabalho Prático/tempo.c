@@ -41,10 +41,17 @@
 #define FAULT 2     // Um processo correto falha.
 #define REPAIR 3    // Um processo falho é corrigido.
 
+//  ------------- ESTADOS -------------
+#define CORRETO 0       // Um processo testa outro processo.
+#define FALHO 1         // Um processo correto falha.
+#define DESCONHECIDO -1 // Um processo falho é corrigido.
+
 //  ------ DESCRITOR DO NODO SMPL -----
 typedef struct{
-    int id;     // Identificador da facility SMPL.
-    int *state;
+    int id;         // Identificador da facility SMPL.
+    int *state;     // Vector State de cada nodo
+    int *testes;    // Vetor contendo testes que nodo deve realizar (atualizado a cada novo evento identificado).
+    int qnt_testes; // Quantidade de nodos que devem ser testador (indicados por '*testes').
 } tnodo;
 
 typedef struct{
@@ -110,6 +117,7 @@ void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
     printf("\n");
 }
 
+// Nodo 'n_testador' testa nodo 'n_testado', chamando a função 'atualizaVectorState' a atualizando vector state de 'n_testador' de acordo com o estado de 'n_testado'.
 void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
     
     // Atualizando vector state de nodo 'n_testador' de acordo com o estado e com o vector state de 'n_testado'.
@@ -125,6 +133,55 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
         printf("\tNodo [%d] testa o nodo [%d] FALHO.\n", n_testador, n_testado);
     }
 
+}
+
+void defineTestes(tnodo *nodo, int id, int qnt_nodos, int qtn_cluster){
+    int s;
+    int i;
+    int j;
+    int *testador;
+    int qtn_cis;
+
+    int x;
+
+    // Armazenando vetor de para retorno da função cisj.
+    testador = (int *) malloc ((qnt_nodos / 2) * sizeof(int));
+    
+    // Zera quantidade de testes que devem ser realizados pelo nodo 'id'.
+    nodo[id].qnt_testes = 0;
+
+    // Para cada cluster 's' de todos os N nodos.
+    for (s = 1; s <= qtn_cluster; s++){
+
+        // intera sobre todos os 'N' nodos.
+        for(i = 0; i < qnt_nodos; i++){
+
+            // Caso nodo 'i' seja diferente de nodo testador 'id' (não se auto-testar).
+            if(i != id){
+
+                // Recupere lista ordenada de testadores de nodo 'i' em cluster 's' (função cisj).
+                qtn_cis = cisj(i, s, -1, testador);
+
+                // Percorre todos os possíveis testadores de nodo 'i' em ordem de função cisj.                         
+                for(j = 0; j < qtn_cis; j++){
+                    
+                    // Verifica se nodo testador[j] existe (casos em que 'qnt_nodos' não é potência de 2) e se o estado de nodo 'testador[j]' é DESCONHECIDO ou CORRETO.
+                    if((testador[j] < qnt_nodos) && ((nodo[id].state[testador[j]] == DESCONHECIDO) || (nodo[id].state[testador[j]] %2 == CORRETO))){
+
+                        // Verifica se primeiro nodo válido e correto encontrado é o nodo 'id'.                                    
+                        if(testador[j] == id){
+                            nodo[id].testes[nodo[id].qnt_testes] = i;   // Adiciona nodo 'i' a lista de testes de nodo 'id'.
+                            nodo[id].qnt_testes ++;                     // Incrementa o contador de nodos testados por nodo 'id'.
+                        }
+                        // Nodo correto encontrado, ecerrar loop sobre lista 'cis'.
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    free(testador);
 }
 
 int main (int argc, char *argv[]){
@@ -160,8 +217,7 @@ int main (int argc, char *argv[]){
     // Calcula e armazena a quantidade de clusersde acordo com a quantidade total de nodos.
     qtn_cluster = log2(N) + 1;
 
-    // Armazenando vetor de para retorno da função cisj.
-    testador = (int *) malloc ((N / 2) * sizeof(int));
+
 
     smpl(0, "Um exemplo de simulação"); // Definindo Identificado para simulação.
     reset();                            // Iniciando / reinicinado simulação.
@@ -177,22 +233,35 @@ int main (int argc, char *argv[]){
         nodo[i].id = facility(fa_name, 1);
     }
 
-    // Allocanto e definindo vetor 'state' para cada nodo.
+    // Allocanto e definindo vetor 'state' e vetor de 'testes' para cada nodo.
     for(i = 0; i < N; i++){
         nodo[i].state = (int *) malloc(N * sizeof(int));
+        nodo[i].testes = (int *) malloc(N * sizeof(int));
         memset(nodo[i].state, -1, N * sizeof(int));
         nodo[i].state[i] = 0;
     }
 
-    // Escalonando testes para todos os nodos executarem no tempo 30.
+    
     for(i = 0; i < N; i++){
-        schedule(TEST, 30.0, i);
+        schedule(TEST, 30.0, i);                // Escalonando testes para todos os nodos executarem no tempo 30.
+        defineTestes(nodo, i, N, qtn_cluster);  // Calculando os testes que cada um dos nodos deverá relaizar.
     }
 
-    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
-    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+    // printf("------------------------------\n");
+    // for(i = 0; i < N; i++){
+    //     printf("nodo %d (%d):\n", i, nodo[i].qnt_testes);
+
+    //     for(j = 0; j < nodo[i].qnt_testes; j++){
+    //         printf("\tTesta %d\n", nodo[i].testes[j]);
+    //     }
+    // }
+    // printf("------------------------------\n");
 
 
+    // exit(1);
+
+    // schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
+    // schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
 
     // Loop de simulação.
     while(time() < T_SIMULACAO){
@@ -208,34 +277,9 @@ int main (int argc, char *argv[]){
 
                 printf("[%3.1f] O nodo [%d] inica testes:\n", time(), token);
 
-                // Para cada cluster 's' de todos os N nodos.
-                for (s = 1; s <= qtn_cluster; s++){
-
-                    // intera sobre todos os 'N' nodos.
-                    for(i = 0; i < N; i++){
-
-                        // Caso nodo 'i' seja diferente de token (não se auto-testar).
-                        if(i != token){
-
-                            // Recupere lista ordenada de testadores de nodo 'i' em cluster 's' (função cis).
-                            qtn_nodos = cisj(i, s, -1, testador);
-
-                            // Percorre todos os possíveis testadores de nodo 'i' em ordem de função cij.                         
-                            for(j = 0; j < qtn_nodos; j++){
-                                
-                                // Verifica se nodo testador[j] existe (casos em que N não é potência de 2) e se este está correto.
-                                if((testador[j] < N) && (status(nodo[testador[j]].id) == 0)){
-
-                                    // Verifica se primeiro nodo válido e correto encontrado é o nodo 'token'.                                    
-                                    if(testador[j] == token){
-                                        testarNodo(nodo, token, i, N);
-                                    }
-                                    // Nodo correto encontrado, ecerrar loop sobre lista 'cis'.
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                for(i = 0; i < nodo[token].qnt_testes; i++){
+                    testarNodo(nodo, token, nodo[token].testes[i], N);
+                    printf("\tNodo [%d] testa o nodo [%d] CORRETO.\n", token, nodo[token].testes[i]);
                 }
 
                 schedule(TEST, 30.0, token);
@@ -261,8 +305,8 @@ int main (int argc, char *argv[]){
     // Liberando memória alocada.
     for(i = 0; i < N; i++){
         free(nodo[i].state);
+        free(nodo[i].testes);
     }
     free(nodo);
-    free(testador);
     exit(0);
 }
