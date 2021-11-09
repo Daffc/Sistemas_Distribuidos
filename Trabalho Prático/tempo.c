@@ -66,83 +66,17 @@ typedef struct{
 
 tnodo *nodo;
 
-// Atualiza entrada de vector state de nodo 'n_testador' na lista 'nodo' com informações referentes a nodo 'n_testado', levando em consideração 
-// o estado de 'n_testado' (CORRETO ou FALHO) e a comparação de entradas de ambos os vector states.  
-void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
-    int i;
 
-    // Caso nodo 'n_testado' esteja correto.
-    if(status(nodo[n_testado].id) == 0){
-        // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
-        if(nodo[n_testador].state[n_testado] == -1)
-            nodo[n_testador].state[n_testado] = 0;
-        
-        // Caso nodo 'n_testado' conste como FALHO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
-        if(nodo[n_testador].state[n_testado] % 2 == 1)
-            nodo[n_testador].state[n_testado] += 1;
-
-        // Comparando Voctor States de nodos 'n_testador' e 'n_testado' e atualizando 'n_testador'.
-        for(i = 0; i < qnt_nodos; i++){
-            // Caso 'i' seja diferente dos nodos envolvidos.
-            if((i != n_testador) && (i != n_testado)){
-                // Caso entrada 'i' de vector state de nodo 'n_testador' tenha valor menor (desatualizado) comparado a entrada 'i' de vector state de nodo 'n_testado', 
-                // atualizar entrada 'i' vector state de nodo 'n_testador' com entrada 'i' de vector state de nodo 'n_testado'.
-                if (nodo[n_testador].state[i] < nodo[n_testado].state[i])
-                    nodo[n_testador].state[i] = nodo[n_testado].state[i];
-            }
-        }
-    }
-        
-    // Caso nodo 'n_testado' esteja falho.
-    else{
-        // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
-        if(nodo[n_testador].state[n_testado] == -1)
-            nodo[n_testador].state[n_testado] = 1;
-        
-        // Caso nodo 'n_testado' conste como CORRETO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
-        if(nodo[n_testador].state[n_testado] % 2 == 0)
-            nodo[n_testador].state[n_testado] += 1;
-        
-    }
-}
-
-// Imprime Vector State de 'nodo[id]'
-void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
-    int i;
-
-    printf("\t\tVector State de nodo [%d]: ", id);
-    for(i = 0; i < qnt_nodos; i++){
-        printf("[%d] = %d; ", i, nodo[id].state[i]);
-    }
-    printf("\n");
-}
-
-// Nodo 'n_testador' testa nodo 'n_testado', chamando a função 'atualizaVectorState' a atualizando vector state de 'n_testador' de acordo com o estado de 'n_testado'.
-void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
-    
-    // Atualizando vector state de nodo 'n_testador' de acordo com o estado e com o vector state de 'n_testado'.
-    atualizaVectorState(nodo, n_testador, n_testado, qnt_nodos);
-
-    // Caso nodo 'n_testado' esteja CORRETO.
-    if(status(nodo[n_testado].id) == 0){
-        printf("\tNodo [%d] testa o nodo [%d] CORRETO.\n", n_testador, n_testado);
-        imprimeVectorState(nodo, n_testador, qnt_nodos);
-    }
-    // Caso nodo 'n_testado' esteja FALHO.
-    else{
-        printf("\tNodo [%d] testa o nodo [%d] FALHO.\n", n_testador, n_testado);
-    }
-
-}
-
-void defineTestes(tnodo *nodo, int id, int qnt_nodos, int qtn_cluster){
+void defineTestes(tnodo *nodo, int id, int qnt_nodos){
     int s;
     int i;
     int j;
     int *testador;
     int qtn_cis;
+    int qtn_cluster;
 
-    int x;
+    // Calcula e armazena a quantidade de clusersde acordo com a quantidade total de nodos.
+    qtn_cluster = log2(qnt_nodos) + 1;
 
     // Armazenando vetor de para retorno da função cisj.
     testador = (int *) malloc ((qnt_nodos / 2) * sizeof(int));
@@ -184,6 +118,82 @@ void defineTestes(tnodo *nodo, int id, int qnt_nodos, int qtn_cluster){
     free(testador);
 }
 
+// Atualiza entrada de vector state de nodo 'n_testador' na lista 'nodo' com informações referentes a nodo 'n_testado', levando em consideração 
+// o estado de 'n_testado' (CORRETO ou FALHO) e a comparação de entradas de ambos os vector states.  
+void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
+    int i;
+
+    // Caso nodo 'n_testado' esteja correto.
+    if(status(nodo[n_testado].id) == 0){
+        // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
+        if(nodo[n_testador].state[n_testado] == -1)
+            nodo[n_testador].state[n_testado] = 0;
+        
+        // Caso nodo 'n_testado' conste como FALHO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
+        if(nodo[n_testador].state[n_testado] % 2 == 1){
+            nodo[n_testador].state[n_testado] += 1;
+            defineTestes(nodo, n_testador, qnt_nodos);
+        }
+
+        // Comparando Voctor States de nodos 'n_testador' e 'n_testado' e atualizando 'n_testador'.
+        for(i = 0; i < qnt_nodos; i++){
+            // Caso 'i' seja diferente dos nodos envolvidos.
+            if((i != n_testador) && (i != n_testado)){
+                // Caso entrada 'i' de vector state de nodo 'n_testador' tenha valor menor (desatualizado) comparado a entrada 'i' de vector state de nodo 'n_testado', 
+                // atualizar entrada 'i' vector state de nodo 'n_testador' com entrada 'i' de vector state de nodo 'n_testado'.
+                if (nodo[n_testador].state[i] < nodo[n_testado].state[i])
+                    nodo[n_testador].state[i] = nodo[n_testado].state[i];
+                    defineTestes(nodo, n_testador, qnt_nodos);
+            }
+        }
+    }
+        
+    // Caso nodo 'n_testado' esteja falho.
+    else{
+        // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
+        if(nodo[n_testador].state[n_testado] == -1){
+            nodo[n_testador].state[n_testado] = 1;
+            defineTestes(nodo, n_testador, qnt_nodos);
+        }
+        
+        // Caso nodo 'n_testado' conste como CORRETO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
+        if(nodo[n_testador].state[n_testado] % 2 == 0){
+            nodo[n_testador].state[n_testado] += 1;
+            defineTestes(nodo, n_testador, qnt_nodos);
+        }
+            
+    }
+}
+
+// Imprime Vector State de 'nodo[id]'
+void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
+    int i;
+
+    printf("\t\tVector State de nodo [%d]: ", id);
+    for(i = 0; i < qnt_nodos; i++){
+        printf("[%d] = %d; ", i, nodo[id].state[i]);
+    }
+    printf("\n");
+}
+
+// Nodo 'n_testador' testa nodo 'n_testado', chamando a função 'atualizaVectorState' a atualizando vector state de 'n_testador' de acordo com o estado de 'n_testado'.
+void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
+    
+    // Atualizando vector state de nodo 'n_testador' de acordo com o estado e com o vector state de 'n_testado'.
+    atualizaVectorState(nodo, n_testador, n_testado, qnt_nodos);
+
+    // Caso nodo 'n_testado' esteja CORRETO.
+    if(status(nodo[n_testado].id) == 0){
+        printf("\tNodo [%d] testa o nodo [%d] CORRETO.\n", n_testador, n_testado);
+        imprimeVectorState(nodo, n_testador, qnt_nodos);
+    }
+    // Caso nodo 'n_testado' esteja FALHO.
+    else{
+        printf("\tNodo [%d] testa o nodo [%d] FALHO.\n", n_testador, n_testado);
+    }
+
+}
+
 int main (int argc, char *argv[]){
     static int  N,          // Número total de processos, recebido por linha de comando.
                 token,      // O processo que "está executando" em um instante de tempo.
@@ -193,7 +203,6 @@ int main (int argc, char *argv[]){
                 i,
                 j,
                 next,
-                qtn_cluster,
                 qtn_nodos,
                 *testador;
 
@@ -213,11 +222,6 @@ int main (int argc, char *argv[]){
         "Este Programa foi executado com N=%d Processos.\n",
         N
     );
-
-    // Calcula e armazena a quantidade de clusersde acordo com a quantidade total de nodos.
-    qtn_cluster = log2(N) + 1;
-
-
 
     smpl(0, "Um exemplo de simulação"); // Definindo Identificado para simulação.
     reset();                            // Iniciando / reinicinado simulação.
@@ -244,24 +248,11 @@ int main (int argc, char *argv[]){
     
     for(i = 0; i < N; i++){
         schedule(TEST, 30.0, i);                // Escalonando testes para todos os nodos executarem no tempo 30.
-        defineTestes(nodo, i, N, qtn_cluster);  // Calculando os testes que cada um dos nodos deverá relaizar.
+        defineTestes(nodo, i, N);  // Calculando os testes que cada um dos nodos deverá relaizar.
     }
 
-    // printf("------------------------------\n");
-    // for(i = 0; i < N; i++){
-    //     printf("nodo %d (%d):\n", i, nodo[i].qnt_testes);
-
-    //     for(j = 0; j < nodo[i].qnt_testes; j++){
-    //         printf("\tTesta %d\n", nodo[i].testes[j]);
-    //     }
-    // }
-    // printf("------------------------------\n");
-
-
-    // exit(1);
-
-    // schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
-    // schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
+    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
 
     // Loop de simulação.
     while(time() < T_SIMULACAO){
@@ -279,7 +270,6 @@ int main (int argc, char *argv[]){
 
                 for(i = 0; i < nodo[token].qnt_testes; i++){
                     testarNodo(nodo, token, nodo[token].testes[i], N);
-                    printf("\tNodo [%d] testa o nodo [%d] CORRETO.\n", token, nodo[token].testes[i]);
                 }
 
                 schedule(TEST, 30.0, token);
