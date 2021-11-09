@@ -181,6 +181,11 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
 
 }
 
+void agendarEventos(){
+    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
+    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+}
+
 int main (int argc, char *argv[]){
     static int  N,          // Número total de processos, recebido por linha de comando.
                 token,      // O processo que "está executando" em um instante de tempo.
@@ -238,8 +243,8 @@ int main (int argc, char *argv[]){
         defineTestes(nodo, i, N);   // Calculando os testes que cada um dos nodos deverá relaizar.
     }
 
-    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
-    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+    // Função que agendará eventos que ocorrerão durante simuação.
+    agendarEventos();
 
     // Loop de simulação.
     while(time() < T_SIMULACAO){
