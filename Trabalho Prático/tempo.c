@@ -169,11 +169,11 @@ void atualizaVectorState(tnodo *nodo, int n_testador, int n_testado, int qnt_nod
 void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
     int i;
 
-    printf("\t\tVector State de nodo [%d]: ", id);
-    for(i = 0; i < qnt_nodos; i++){
-        printf("[%d] = %d; ", i, nodo[id].state[i]);
+    printf("\tVector State de nodo [%d]: {", id);
+    for(i = 0; i < qnt_nodos-1; i++){
+        printf("%d, ", nodo[id].state[i]);
     }
-    printf("\n");
+    printf("%d}\n", nodo[id].state[i]);
 }
 
 // Nodo 'n_testador' testa nodo 'n_testado', chamando a função 'atualizaVectorState' a atualizando vector state de 'n_testador' de acordo com o estado de 'n_testado'.
@@ -185,7 +185,6 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos){
     // Caso nodo 'n_testado' esteja CORRETO.
     if(status(nodo[n_testado].id) == 0){
         printf("\tNodo [%d] testa o nodo [%d] CORRETO.\n", n_testador, n_testado);
-        imprimeVectorState(nodo, n_testador, qnt_nodos);
     }
     // Caso nodo 'n_testado' esteja FALHO.
     else{
@@ -223,9 +222,9 @@ int main (int argc, char *argv[]){
         N
     );
 
-    smpl(0, "Um exemplo de simulação"); // Definindo Identificado para simulação.
-    reset();                            // Iniciando / reinicinado simulação.
-    stream(1);                          // Definindo 1 fluxo para simuação.
+    smpl(0, "Simuação 'TRABALHO PRÁTICO'.");    // Definindo Identificado para simulação.
+    reset();                                    // Iniciando / reinicinado simulação.
+    stream(1);                                  // Definindo 1 fluxo para simuação.
     
     // Inicialização de variáveis.
     nodo = (tnodo *) malloc(N * sizeof(tnodo)); // Allocando espaço para N nodos.
@@ -271,7 +270,9 @@ int main (int argc, char *argv[]){
                 for(i = 0; i < nodo[token].qnt_testes; i++){
                     testarNodo(nodo, token, nodo[token].testes[i], N);
                 }
-
+                
+                imprimeVectorState(nodo, token, N);
+                
                 schedule(TEST, 30.0, token);
                 break;
 
