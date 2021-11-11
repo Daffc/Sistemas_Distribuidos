@@ -53,7 +53,7 @@ void defineTestes(tnodo *nodo, int id, int qnt_nodos){
     qtn_cluster = log2(qnt_nodos) + 1;
 
     // Armazenando vetor de para retorno da função cisj.
-    testador = (int *) malloc((qnt_nodos / 2) * sizeof(int));
+    testador = (int *) malloc(qnt_nodos * sizeof(int));
     
     // Zera quantidade de testes que devem ser realizados pelo nodo 'id'.
     nodo[id].qnt_testes = 0;
