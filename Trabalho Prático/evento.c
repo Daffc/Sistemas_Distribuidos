@@ -21,7 +21,7 @@ int checaEventoDiagnosticado(tevento *evento, int qnt_nodos){
     int cont;
 
     cont = 0;
-    // Conta quantiade de enntradas com valor '1'.
+    // Conta quantiade de entradas em de 'aletados' com valor '1'.
     for(i = 0; i < qnt_nodos; i++)
         cont += evento->alertados[i];
 
@@ -76,7 +76,7 @@ void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, i
     evento->nodo = id;                          // Armazena nodo que sofreu o evento.
     evento->tipo = tipo;                        // Armazena tipo de evendo sofrido por nodo 'id'.
     evento->diagnosticando = 1;                 // Indica que evento atual está em processo de diagnóstico.
-    evento->cout_rodada = 0;                    // Reicinializa contador de roadadas.
+    evento->cout_rodada = 1;                    // Reicinializa contador de roadadas (No mínimo 1 rodada necessária para o descobrimento de um evento).
     evento->cout_testes = 0;                    // Reicinializa contador de testes.
     evento->t_inicio = time();                  // Armazena tempo de iníncio do evento.
 
@@ -92,6 +92,33 @@ void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, i
     }
 
     evento->alertados[id] = 1;                  // Indica que o nodo que sofreu o evento está atualizado sobre a sua situação.
+}
+
+void verificaRodadaCompleta(tevento *evento, tnodo *nodo, int qnt_nodos){
+    int i;
+    int cont;
+
+    // Conta quantidade de entradas de 'rodada_completa' com valor '1'.
+    for(i = 0; i < qnt_nodos; i++)
+        cont += evento->rodada_completa[i];
+
+    
+    // Caso todas as entradas de 'rodada_completa' tenham valor '1', todos os nodos corretos completaram seus testes, ou seja, uma rodada foi completa.
+    if (cont == qnt_nodos){
+
+        // Contabiliza rodada em intervalo de diagnóstico.
+        evento->cout_rodada ++;
+
+        // Reinicializa vetor "rodada_completa" para contabilização de nova rodada.
+        for(i = 0; i < qnt_nodos; i++){
+            if(status(nodo[i].id) != CORRETO){
+                evento->rodada_completa[i] = 1;     // Nodos FALHOS constarão como rodada completa.
+            }
+            else{
+                evento->rodada_completa[i] = 0;     // Nodos FALHOS constarão como rodada NÃO completa.  
+            }
+        }
+    }
 }
 
 // Libera alocações de estrutura Evento.

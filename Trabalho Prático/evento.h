@@ -32,7 +32,10 @@
     // Inicializa valores para novo evento do tipo 'tipo' sofrido pelo nodo 'id'.
     void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, int tipo);
 
+    void verificaRodadaCompleta(tevento *evento, tnodo *nodo,int qnt_nodos);
+
     // Libera alocações de estrutura Evento.
     void liberaEvento(tevento *evento);
+
 
 #endif

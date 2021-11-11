@@ -48,13 +48,12 @@ void defineTestes(tnodo *nodo, int id, int qnt_nodos){
     int *testador;
     int qtn_cis;
     int qtn_cluster;
-    tevento evento;
 
     // Calcula e armazena a quantidade de clusersde acordo com a quantidade total de nodos.
     qtn_cluster = log2(qnt_nodos) + 1;
 
     // Armazenando vetor de para retorno da função cisj.
-    testador = (int *) malloc ((qnt_nodos / 2) * sizeof(int));
+    testador = (int *) malloc((qnt_nodos / 2) * sizeof(int));
     
     // Zera quantidade de testes que devem ser realizados pelo nodo 'id'.
     nodo[id].qnt_testes = 0;
@@ -180,8 +179,6 @@ void imprimeInicializacao(tnodo *nodo, int qnt_nodos){
         for(j = 0; j < nodo[i].qnt_testes - 1; j++){
             printf("%d, ", nodo[i].testes[j]);
         }
-        printf("%d}\n", nodo[i].testes[j]);
-
         printf("\t\tVector State: {");
         for(j = 0; j < qnt_nodos - 1; j++){
             printf("%d, ", nodo[i].state[j]);
@@ -203,11 +200,7 @@ int main (int argc, char *argv[]){
                 token,      // O processo que "está executando" em um instante de tempo.
                 event,      // Evento.
                 r,
-                s,
-                i,
-                j,
-                next,
-                qtn_nodos;
+                i;
 
     static char fa_name[5]; // Nome da facility.
 
@@ -282,13 +275,19 @@ int main (int argc, char *argv[]){
 
                 printf("[%3.1f] O nodo [%d] inica testes:\n", time(), token);
 
+                // Nodo "token" testará "qnt_testes" de acordo com indicado em seu vetor de testes "testes".
                 for(i = 0; i < nodo[token].qnt_testes; i++){
-                    testarNodo(nodo, token, nodo[token].testes[i], N, &evento);
-                    evento.cout_testes ++;
+                    testarNodo(nodo, token, nodo[token].testes[i], N, &evento); 
+                    evento.cout_testes ++;  // Contabiliza teste em estrutura evento.
                 }
 
+                // Caso 'evento' esteja sendo diagnosticado.
                 if(evento.diagnosticando){
-                    imprimeEventoTeste(&evento, N);
+                    // Atualiza entrada de nodo 'token' em vetor 'rodada_completa', indicando que em rodada atual, vetor token já efetuou todos os testes.
+                    evento.rodada_completa[token] = 1;
+                    verificaRodadaCompleta(&evento, nodo, N);
+                    // imprimeEventoTeste(&evento, N);     //DEBUG:
+
                 }
                 
                 imprimeVectorState(nodo, token, N);
