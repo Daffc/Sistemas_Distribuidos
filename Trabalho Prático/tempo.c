@@ -133,9 +133,45 @@ void imprimeVectorState(tnodo *nodo, int id, int qnt_nodos){
     printf("%d}\n", nodo[id].state[i]);
 }
 
-void identificaEvento(int n_testador, int n_testado, tevento * evento){
+// imprime informações de evento em log.
+void imprimeDiagnostico(tevento *evento){
+    printf("\t\tO evento em nodo [%d] foi diagnosticado:\n", evento->nodo);
+    if(evento->tipo == FAULT)
+        printf("\t\t\tTipo: FALHA\n");
+    if(evento->tipo == REPAIR)
+        printf("\t\t\tTipo: REPARAÇÂO\n");
+    printf("\t\t\tRodadas: %d\n", evento->cout_rodada);
+    printf("\t\t\tTestes: %d\n", evento->cout_testes);
+    printf("\t\t\tTempo Inicio: %3.1f\n", evento->t_inicio);
+    printf("\t\t\tTempo Fim: %3.1f\n", time());
+}
+
+// Verifica se evento 'evento' foi completamente diagnosticado, retornando '1' para verdadeiro e '0' para falso.
+int checaEventoDiagnosticado(tevento *evento, int qnt_nodos){
+    int i;
+    int cont;
+
+    cont = 0;
+    // Conta quantiade de enntradas com valor '1'.
+    for(i = 0; i < qnt_nodos; i++)
+        cont += evento->alertados[i];
+
+    // Caso todas as entradas de 'alertados' tenham valor '1', evento foi diagnosticado.
+    if (cont == qnt_nodos)
+        return 1;
+
+    return 0;
+}
+
+void identificaEvento(int n_testador, int n_testado, tevento *evento, int qnt_nodos){
     if(evento->nodo == n_testado){
         evento->alertados[n_testador] = 1;
+
+        // Verifica se evento foi diagnosticado e, caso verdadero, imprime informações de eevento e desabilita flag 'diagnosticando'.
+        if(checaEventoDiagnosticado(evento, qnt_nodos)){
+            imprimeDiagnostico(evento);
+            evento->diagnosticando = 0;
+        }
     }
 }
 
@@ -154,7 +190,7 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
         // Caso nodo 'n_testado' conste como FALHO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
         if(nodo[n_testador].state[n_testado] % 2 == FALHO){
             nodo[n_testador].state[n_testado] += 1;
-            identificaEvento(n_testador, n_testado, evento);
+            identificaEvento(n_testador, n_testado, evento, qnt_nodos);
             defineTestes(nodo, n_testador, qnt_nodos);  // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
         }
 
@@ -165,9 +201,9 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
                 // Caso entrada 'i' de vector state de nodo 'n_testador' tenha valor menor (desatualizado) comparado a entrada 'i' de vector state de nodo 'n_testado', 
                 // atualizar entrada 'i' vector state de nodo 'n_testador' com entrada 'i' de vector state de nodo 'n_testado'.
                 if (nodo[n_testador].state[i] < nodo[n_testado].state[i]){
-                    printf("\t\t Recuperando entrada [%d].\n", i);
+                    printf("\t\tRecuperando entrada [%d].\n", i);
                     nodo[n_testador].state[i] = nodo[n_testado].state[i];
-                    identificaEvento(n_testador, n_testado, evento);
+                    identificaEvento(n_testador, i, evento, qnt_nodos);        
                     defineTestes(nodo, n_testador, qnt_nodos);          // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
                 }
             }
@@ -180,14 +216,14 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
         // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
         if(nodo[n_testador].state[n_testado] == DESCONHECIDO){
             nodo[n_testador].state[n_testado] = FALHO;
-            identificaEvento(n_testador, n_testado, evento);
+            identificaEvento(n_testador, n_testado, evento, qnt_nodos);
             defineTestes(nodo, n_testador, qnt_nodos);  // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
         }
         
         // Caso nodo 'n_testado' conste como CORRETO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
         if(nodo[n_testador].state[n_testado] % 2 == CORRETO){
             nodo[n_testador].state[n_testado] += 1;
-            identificaEvento(n_testador, n_testado, evento);
+            identificaEvento(n_testador, n_testado, evento, qnt_nodos);
             defineTestes(nodo, n_testador, qnt_nodos);  // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
         }
     }
@@ -233,31 +269,34 @@ void inicializaEvento(tevento *evento, int qnt_nodos){
 }
 
 // Imprime estrutura evento e seus componentes.
-void imprimeEvento(tevento *evento, int qnt_nodos){
+void imprimeEventoTeste(tevento *evento, int qnt_nodos){
     int i;
-
-    printf("EVENTO:\n");
-    printf("\tnodo: %d\n", evento->nodo);
-    printf("\ttipo: %d\n", evento->tipo);
-    printf("\tdiagnosticando: %d\n", evento->diagnosticando);
-    printf("\tcout_rodada: %d\n", evento->cout_rodada);
-    printf("\tcout_testes: %d\n", evento->cout_testes);
-    printf("\tt_inicio: %3.1f\n", evento->t_inicio);
-    printf("\tt_fim: %3.1f\n", evento->t_fim);
-    printf("\talertados: ");
+    printf("\t******************************\n");
+    printf("\t*EVENTO:\n");
+    printf("\t*\tnodo: %d\n", evento->nodo);
+    printf("\t*\ttipo: %d\n", evento->tipo);
+    printf("\t*\tdiagnosticando: %d\n", evento->diagnosticando);
+    printf("\t*\tcout_rodada: %d\n", evento->cout_rodada);
+    printf("\t*\tcout_testes: %d\n", evento->cout_testes);
+    printf("\t*\tt_inicio: %3.1f\n", evento->t_inicio);
+    printf("\t*\tt_fim: %3.1f\n", evento->t_fim);
+    printf("\t*\talertados: ");
     for(i = 0; i < qnt_nodos; i++){
         printf("%d ", evento->alertados[i]);
     }
     printf("\n");
-    printf("\trodada_completa: ");
+    printf("\t*\trodada_completa: ");
     for(i = 0; i < qnt_nodos; i++){
         printf("%d ", evento->rodada_completa[i]);
     }
     printf("\n");
+    printf("\t******************************\n");
 }
 
 // Inicializa valores para novo evento do tipo 'tipo' sofrido pelo nodo 'id'.
 void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, int tipo){
+    int i;
+
     evento->nodo = id;                          // Armazena nodo que sofreu o evento.
     evento->tipo = tipo;                        // Armazena tipo de evendo sofrido por nodo 'id'.
     evento->diagnosticando = 1;                 // Indica que evento atual está em processo de diagnóstico.
@@ -269,6 +308,10 @@ void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, i
         if(status(nodo[i].id) != CORRETO){
             evento->alertados[i] = 1;           // Nodos FALHOS constarão como alertados.
             evento->rodada_completa[i] = 1;     // Nodos FALHOS constarão como rodada completa.
+        }
+        else{
+            evento->alertados[i] = 0;           // Nodos CORRETOS constarão como NÃO alertados.
+            evento->rodada_completa[i] = 0;     // Nodos FALHOS constarão como rodada NÃO completa.  
         }
     }
 
@@ -336,13 +379,8 @@ int main (int argc, char *argv[]){
     }
 
     inicializaEvento(&evento, N);
-    imprimeEvento(&evento, N);
-    inicializaNovoEvento(nodo, &evento, N, 1 ,FAULT);
-    imprimeEvento(&evento, N);
 
-    liberaEvento(&evento);
 
-    exit(0);
 
     for(i = 0; i < N; i++){
         schedule(TEST, 30.0, i);    // Escalonando testes para todos os nodos executarem no tempo 30.
@@ -374,6 +412,10 @@ int main (int argc, char *argv[]){
                     testarNodo(nodo, token, nodo[token].testes[i], N, &evento);
                     evento.cout_testes ++;
                 }
+
+                if(evento.diagnosticando){
+                    imprimeEventoTeste(&evento, N);
+                }
                 
                 imprimeVectorState(nodo, token, N);
                 
@@ -387,6 +429,8 @@ int main (int argc, char *argv[]){
                     break;
                 }
                 printf("[%3.1f] O nodo [%d] falhou.\n", time(), token);
+    
+                inicializaNovoEvento(nodo, &evento, N, token ,FAULT);
                 break;
 
             case REPAIR:
@@ -403,6 +447,7 @@ int main (int argc, char *argv[]){
         free(nodo[i].state);
         free(nodo[i].testes);
     }
+    liberaEvento(&evento);
     free(nodo);
     exit(0);
 }
