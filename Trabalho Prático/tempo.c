@@ -119,7 +119,7 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
         // Caso nodo 'n_testado' conste como FALHO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
         if(nodo[n_testador].state[n_testado] % 2 == FALHO){
             nodo[n_testador].state[n_testado] += 1;
-            identificaEvento(n_testador, n_testado, evento, qnt_nodos);
+            identificaEvento(n_testador, n_testado, (nodo[n_testador].state[n_testado] % 2), evento, qnt_nodos);
             defineTestes(nodo, n_testador, qnt_nodos);  // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
         }
 
@@ -132,7 +132,7 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
                 if (nodo[n_testador].state[i] < nodo[n_testado].state[i]){
                     printf("\t\tRecuperando entrada [%d].\n", i);
                     nodo[n_testador].state[i] = nodo[n_testado].state[i];
-                    identificaEvento(n_testador, i, evento, qnt_nodos);        
+                    identificaEvento(n_testador, i, (nodo[n_testador].state[i] % 2), evento, qnt_nodos);      
                     defineTestes(nodo, n_testador, qnt_nodos);          // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
                 }
             }
@@ -145,14 +145,14 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
         // Verifica se é a primeira vez que nodo 'n_testado' está sendo observado por nodo 'n_testador' direta ou indiretamente.
         if(nodo[n_testador].state[n_testado] == DESCONHECIDO){
             nodo[n_testador].state[n_testado] = FALHO;
-            identificaEvento(n_testador, n_testado, evento, qnt_nodos);
+            identificaEvento(n_testador, n_testado, (nodo[n_testador].state[n_testado] % 2), evento, qnt_nodos);
             defineTestes(nodo, n_testador, qnt_nodos);  // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
         }
         
         // Caso nodo 'n_testado' conste como CORRETO em vector state de nodo 'n_testador', atualizar entrada 'n_testado'.
         if(nodo[n_testador].state[n_testado] % 2 == CORRETO){
             nodo[n_testador].state[n_testado] += 1;
-            identificaEvento(n_testador, n_testado, evento, qnt_nodos);
+            identificaEvento(n_testador, n_testado, (nodo[n_testador].state[n_testado] % 2), evento, qnt_nodos);
             defineTestes(nodo, n_testador, qnt_nodos);  // Novo evento identificado, atualiazar vetor de testes de nodo 'testador'.
         }
     }
@@ -161,7 +161,7 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
 
 // Define Agendamento de eventos da simualação.
 void agendarEventos(){
-    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 0.
+    schedule(FAULT, 31.0, 3);   // O processo 1 falha no tempo 0.
     // schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
 }
 
@@ -303,13 +303,14 @@ int main (int argc, char *argv[]){
                 }
                 printf("[%3.1f] O nodo [%d] falhou.\n", time(), token);
     
-                inicializaNovoEvento(nodo, &evento, N, token ,FAULT);
+                inicializaNovoEvento(nodo, &evento, N, token , status(nodo[token].id));
                 break;
 
             case REPAIR:
                 release(nodo[token].id, token);
                 printf("[%3.1f] O nodo [%d] recuperou.\n", time(), token);
                 schedule(TEST, 30.0, token);
+                inicializaNovoEvento(nodo, &evento, N, token , status(nodo[token].id));
                 break;
         }
     }
