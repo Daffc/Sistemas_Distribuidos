@@ -45,7 +45,7 @@ int main (int argc, char *argv[]){
 
     // Imprimindo header de log.
     printf(
-        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa .\n"
+        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 1, Tarefa .\n"
         "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
         "Este Programa foi executado com N=%d Processos.\n",
         N
