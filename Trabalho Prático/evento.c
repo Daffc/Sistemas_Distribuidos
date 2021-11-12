@@ -5,10 +5,10 @@
 // imprime informações de evento em log.
 void imprimeDiagnostico(tevento *evento){
     printf("\t\tO evento em nodo [%d] foi diagnosticado:\n", evento->nodo);
-    if(evento->tipo == FAULT)
-        printf("\t\t\tTipo: FALHA\n");
-    if(evento->tipo == REPAIR)
+    if(evento->tipo == 0)
         printf("\t\t\tTipo: REPARAÇÂO\n");
+    if(evento->tipo == 1)    
+        printf("\t\t\tTipo: FALHA\n");
     printf("\t\t\tRodadas: %d\n", evento->cout_rodada);
     printf("\t\t\tTestes: %d\n", evento->cout_testes);
     printf("\t\t\tTempo Inicio: %3.1f\n", evento->t_inicio);
@@ -32,16 +32,27 @@ int checaEventoDiagnosticado(tevento *evento, int qnt_nodos){
     return 0;
 }
 // Verifica se 'n_testado' é o nodo relacionado a 'evento', caso positivo, indicando em 'evento' que nodo 'n_testado' esta ciente do evento e verifica se o diagnostico foi completo.
-void identificaEvento(int n_testador, int n_testado, tevento *evento, int qnt_nodos){
-    if(evento->nodo == n_testado){
-        evento->alertados[n_testador] = 1;
+void identificaEvento(int n_testador, int n_testado, int tipo_evento, tevento *evento, int qnt_nodos){
+    // Verifica se evento esta em fase de diagnostico (flag diagnosticando).
+    if(evento->diagnosticando){
+        // Verifica se nodo testado (evento percebido) é o nodo registrado pela estrutura 'evento'.
+        if(evento->nodo == n_testado){
+            // Verifica se evento percebido por 'n_testador' em nodo 'n_testado' é o mesmo tipo de evento gerenciado por 'evento'.
+            if(evento->tipo == tipo_evento){
+                // informar a estrutura 'evento' que nodo 'n_testador' está a par de sua situação.
+                evento->alertados[n_testador] = 1;
 
-        // Verifica se evento foi diagnosticado e, caso verdadero, imprime informações de eevento e desabilita flag 'diagnosticando'.
-        if(checaEventoDiagnosticado(evento, qnt_nodos)){
-            imprimeDiagnostico(evento);
-            evento->diagnosticando = 0;
+                // Verifica se evento foi diagnosticado e, caso verdadero, imprime informações de evento e desabilita flag 'diagnosticando'.
+                if(checaEventoDiagnosticado(evento, qnt_nodos)){
+                    imprimeDiagnostico(evento);
+                    evento->diagnosticando = 0;
+                }
+
+            }
         }
+        
     }
+
 }
 
 // Imprime estrutura evento e seus componentes.
@@ -91,21 +102,20 @@ void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, i
         }
     }
 
-    evento->alertados[id] = 1;                  // Indica que o nodo que sofreu o evento está atualizado sobre a sua situação.
+    evento->alertados[id] = 1;                  // Indica que o 2nodo que sofreu o evento está atualizado sobre a sua situação.
 }
 
 void verificaRodadaCompleta(tevento *evento, tnodo *nodo, int qnt_nodos){
     int i;
     int cont;
 
+    cont = 0;
     // Conta quantidade de entradas de 'rodada_completa' com valor '1'.
     for(i = 0; i < qnt_nodos; i++)
         cont += evento->rodada_completa[i];
 
-    
     // Caso todas as entradas de 'rodada_completa' tenham valor '1', todos os nodos corretos completaram seus testes, ou seja, uma rodada foi completa.
     if (cont == qnt_nodos){
-
         // Contabiliza rodada em intervalo de diagnóstico.
         evento->cout_rodada ++;
 

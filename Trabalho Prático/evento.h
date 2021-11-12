@@ -23,8 +23,8 @@
     // Verifica se evento 'evento' foi completamente diagnosticado, retornando '1' para verdadeiro e '0' para falso.
     int checaEventoDiagnosticado(tevento *evento, int qnt_nodos);
 
-    // Verifica se 'n_testado' é o nodo relacionado a 'evento', caso positivo, indicando em 'evento' que nodo 'n_testado' esta ciente do evento e verifica se o diagnostico foi completo.
-    void identificaEvento(int n_testador, int n_testado, tevento *evento, int qnt_nodos);
+    // Verifica se 'n_testado' é o nodo relacionado a 'evento' e se o evento 'tipo_evento' é do mesmo tipo que 'evento', caso positivo, indicando em 'evento' que nodo 'n_testado' esta ciente do evento e verifica se o diagnostico foi completo.
+    void identificaEvento(int n_testador, int n_testado, int tipo_evento, tevento *evento, int qnt_nodos);
 
     // Imprime estrutura evento e seus componentes.
     void imprimeEventoTeste(tevento *evento, int qnt_nodos);
