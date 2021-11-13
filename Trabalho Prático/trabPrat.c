@@ -162,7 +162,7 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
 // Define Agendamento de eventos da simualação.
 void agendarEventos(){
     schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 31.0.
-    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 61.0.
 }
 
 // Imprime informações dos nodos antes de iniciar simulação.
@@ -187,13 +187,6 @@ void imprimeInicializacao(tnodo *nodo, int qnt_nodos){
         printf("%d}\n", nodo[i].state[j]);
     }
     printf("\n\n");
-}
-
-// Inicializa estrutura 'tevento' de acordo com a quantidade de nodos 'qnt_nodos'.
-void inicializaEvento(tevento *evento, int qnt_nodos){
-    evento->diagnosticando = 0;                              // Indica que evento atual já foi diagnosticado (uma vez que não existe evento).
-    evento->alertados = (char *) malloc(qnt_nodos);          // Alocando espaço para vetor de nodos alertados sobre evento.
-    evento->rodada_completa = (char *) malloc(qnt_nodos);    // Alocando espaço para vetor de nodos com rodada completa.
 }
 
 int main (int argc, char *argv[]){
@@ -246,9 +239,8 @@ int main (int argc, char *argv[]){
         nodo[i].state[i] = 0;
     }
 
+    // Inicializa-se estruura evento, alocando espaço em memória e inalizando que nenhum diagnóstico está sendo efetuado (diagnosticando = 0)
     inicializaEvento(&evento, N);
-
-
 
     for(i = 0; i < N; i++){
         schedule(TEST, 30.0, i);    // Escalonando testes para todos os nodos executarem no tempo 30.

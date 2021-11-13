@@ -11,6 +11,13 @@
 #include "evento.h"
 #include "smpl.h"
 
+// Inicializa estrutura 'tevento' de acordo com a quantidade de nodos 'qnt_nodos'.
+void inicializaEvento(tevento *evento, int qnt_nodos){
+    evento->diagnosticando = 0;                              // Indica que evento atual já foi diagnosticado (uma vez que não existe evento).
+    evento->alertados = (char *) malloc(qnt_nodos);          // Alocando espaço para vetor de nodos alertados sobre evento.
+    evento->rodada_completa = (char *) malloc(qnt_nodos);    // Alocando espaço para vetor de nodos com rodada completa.
+}
+
 // imprime informações de evento em log.
 void imprimeDiagnostico(tevento *evento){
     printf("\t\tO evento em nodo [%d] foi diagnosticado:\n", evento->nodo);

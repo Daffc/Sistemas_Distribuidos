@@ -25,6 +25,8 @@
         char *rodada_completa;   // Vetor que lista nodos que completaram sua bateria de testes, uma vez que todos os nodos corretos completam sua bateria de testes, uma nova rodada é conabilizada (count_rodada ++), reinicializando os valores deste vetor.
     } tevento;
 
+    // Inicializa estrutura 'tevento' de acordo com a quantidade de nodos 'qnt_nodos'.
+    void inicializaEvento(tevento *evento, int qnt_nodos);
 
     // imprime informações de evento em log.
     void imprimeDiagnostico(tevento *evento);
