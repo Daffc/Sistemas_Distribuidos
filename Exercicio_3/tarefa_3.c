@@ -1,11 +1,11 @@
 /*
     Programa: 
-        Tarefa 2: Cada processo correto executa testes até achar outro processo correto. 
-            Lembre-se de tratar o caso em que todos os demais processos estão falhos. 
-            Imprimir os testes e resultados. 
+        Tarefa 3: Cada processo mantém localmente o vetor State[N]. Inicializa o State[N] com -1 (indicando estado “unknown”) para todos 
+        os demais processos e 0 para o próprio processo. Nesta tarefa ao executar um teste, o processo atualiza a entrada correspondente 
+        no vetor State[N]. Em cada intervalo de testes, mostre o vetor State[N]. 
 
     Autor: Douglas Affonso Clementino
-    Data da última modificação: 25/10/2021
+    Data da última modificação: 29/10/2021
 */
 
 #include <stdio.h>
@@ -22,6 +22,7 @@
 //  ------ DESCRITOR DO NODO SMPL -----
 typedef struct{
     int id;     // Identificador da facility SMPL.
+    int *state;
 } tnodo;
 
 tnodo *nodo;
@@ -32,6 +33,7 @@ int main (int argc, char *argv[]){
                 event,      // Evento.
                 r,
                 i,
+                j,
                 next;
 
     static char fa_name[5];  // Nome da facility.
@@ -45,7 +47,7 @@ int main (int argc, char *argv[]){
 
     // Imprimindo header de log.
     printf(
-        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 2.\n"
+        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 3.\n"
         "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
         "Este Programa foi executado com N=%d Processos.\n",
         N
@@ -65,12 +67,17 @@ int main (int argc, char *argv[]){
         nodo[i].id = facility(fa_name, 1);
     }
 
+    // Allocanto e definindo vetor 'state' para cada nodo.
+    for(i = 0; i < N; i++){
+        nodo[i].state = (int *) malloc(N * sizeof(int));
+        memset(nodo[i].state, -1, N * sizeof(int));
+        nodo[i].state[i] = 0;
+    }
+
     // Escalonando testes para todos os nodos executarem no tempo 30.
     for(i = 0; i < N; i++){
         schedule(TEST, 30.0, i);
     }
-
-
 
     schedule(FAULT, 0.0, 1);   // O processo 1 falha no tempo 0.
     schedule(REPAIR, 31.0, 1);  // O processo 1 recupera no tempo 31.
@@ -80,6 +87,7 @@ int main (int argc, char *argv[]){
         schedule(FAULT, 40.0, i);   
         schedule(REPAIR, 70.0, i);
     }
+
 
 
     // Loop de simulação.
@@ -93,17 +101,19 @@ int main (int argc, char *argv[]){
                 if (status(nodo[token].id) != 0)    
                     break; 
 
-                // Calcula id de primeiro nodo que será testado por nodo atual.
+                // Calcula id de primeiro nodo que será testado por nodo atual e atualiza entrada de state de nodo 'next'.
                 next = (token + 1) % N;
-
+                nodo[token].state[next] = status(nodo[next].id);
+                
                 // Equanto nodo indicado por 'next' não estiver correto e não for o nodo atual (token)
                 while(status(nodo[next].id) && (next != token)){
 
                     // Imprime que nodo 'next' esta FALHO.
                     printf("[%3.1f] O nodo [%d] testa o nodo [%d] FALHO.\n", time(), token, next);
 
-                    // Calcula id nodo próximo a 'next'.
+                    // Calcula id nodo próximo a 'next' e atualiza entrada de state de nodo 'next'.
                     next = (next + 1) % N;
+                    nodo[token].state[next] = status(nodo[next].id);
                 }
 
                 if(next != token){
@@ -112,6 +122,14 @@ int main (int argc, char *argv[]){
                 else{
                     printf("[%3.1f] O nodo [%d] não encontrou nenhum outro nodo correto.\n", time(), token);
                 }
+
+                // Imprime vetor 'state' de nodo 'token'.
+                printf("\tVetor 'state' de nodo [%d]:\n", token);
+                printf("\t");
+                for(i = 0; i < N; i++){
+                    printf("[%d] = %d; ", i, nodo[token].state[i]);
+                }
+                printf("\n");
 
                 schedule(TEST, 30.0, token);
                 break;
@@ -133,6 +151,10 @@ int main (int argc, char *argv[]){
         }
     }
 
+    // Liberando memória alocada.
+    for(i = 0; i < N; i++){
+        free(nodo[i].state);
+    }
     free(nodo);
     exit(0);
 }

@@ -1,0 +1,42 @@
+Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 3.
+Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.
+Este Programa foi executado com N=4 Processos.
+[0.0] O nodo [1] falhou.
+[30.0] O nodo [0] testa o nodo [1] FALHO.
+[30.0] O nodo [0] testa o nodo [2] CORRETO.
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 1; [2] = 0; [3] = -1; 
+[30.0] O nodo [2] testa o nodo [3] CORRETO.
+	Vetor 'state' de nodo [2]:
+	[0] = -1; [1] = -1; [2] = 0; [3] = 0; 
+[30.0] O nodo [3] testa o nodo [0] CORRETO.
+	Vetor 'state' de nodo [3]:
+	[0] = 0; [1] = -1; [2] = -1; [3] = 0; 
+[31.0] O nodo [1] recuperou.
+[40.0] O nodo [1] falhou.
+[40.0] O nodo [2] falhou.
+[40.0] O nodo [3] falhou.
+[60.0] O nodo [0] testa o nodo [1] FALHO.
+[60.0] O nodo [0] testa o nodo [2] FALHO.
+[60.0] O nodo [0] testa o nodo [3] FALHO.
+[60.0] O nodo [0] não encontrou nenhum outro nodo correto.
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 1; [2] = 1; [3] = 1; 
+[70.0] O nodo [1] recuperou.
+[70.0] O nodo [2] recuperou.
+[70.0] O nodo [3] recuperou.
+[90.0] O nodo [0] testa o nodo [1] CORRETO.
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 0; [2] = 1; [3] = 1; 
+[100.0] O nodo [1] testa o nodo [2] CORRETO.
+	Vetor 'state' de nodo [1]:
+	[0] = -1; [1] = 0; [2] = 0; [3] = -1; 
+[100.0] O nodo [2] testa o nodo [3] CORRETO.
+	Vetor 'state' de nodo [2]:
+	[0] = -1; [1] = -1; [2] = 0; [3] = 0; 
+[100.0] O nodo [3] testa o nodo [0] CORRETO.
+	Vetor 'state' de nodo [3]:
+	[0] = 0; [1] = -1; [2] = -1; [3] = 0; 
+[120.0] O nodo [0] testa o nodo [1] CORRETO.
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 0; [2] = 1; [3] = 1; 

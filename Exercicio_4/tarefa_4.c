@@ -1,11 +1,10 @@
 /*
     Programa: 
-        Tarefa 3: Cada processo mantém localmente o vetor State[N]. Inicializa o State[N] com -1 (indicando estado “unknown”) para todos 
-        os demais processos e 0 para o próprio processo. Nesta tarefa ao executar um teste, o processo atualiza a entrada correspondente 
-        no vetor State[N]. Em cada intervalo de testes, mostre o vetor State[N]. 
+         Tarefa 4: Quando um processo correto testa outro processo correto obtém as informações de diagnóstico 
+         do processo testado sobre todos os processos do sistema exceto aqueles que testou nesta rodada, além do próprio testador. 
 
     Autor: Douglas Affonso Clementino
-    Data da última modificação: 25/10/2021
+    Data da última modificação: 29/10/2021
 */
 
 #include <stdio.h>
@@ -19,6 +18,11 @@
 #define FAULT 2     // Um processo correto falha.
 #define REPAIR 3    // Um processo falho é corrigido.
 
+//  ------------- ESTADOS -------------
+#define CORRETO 0   // Estado de um processo correto.
+#define FALHO 1     // Estado de um processo falho.
+
+
 //  ------ DESCRITOR DO NODO SMPL -----
 typedef struct{
     int id;     // Identificador da facility SMPL.
@@ -28,9 +32,10 @@ typedef struct{
 tnodo *nodo;
 
 int main (int argc, char *argv[]){
-    static int  N,          // Número total de processos, recebido por linha de comando.
-                token,      // O processo que "está executando" em um instante de tempo.
-                event,      // Evento.
+    static int  N,              // Número total de processos, recebido por linha de comando.
+                token,          // O processo que "está executando" em um instante de tempo.
+                event,          // Evento.
+                nodo_counter,   // Utilizado para contar a quantiadade de nodos testados por um nodo durante uma rodada.
                 r,
                 i,
                 j,
@@ -47,7 +52,7 @@ int main (int argc, char *argv[]){
 
     // Imprimindo header de log.
     printf(
-        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 3.\n"
+        "Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 4.\n"
         "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
         "Este Programa foi executado com N=%d Processos.\n",
         N
@@ -67,11 +72,10 @@ int main (int argc, char *argv[]){
         nodo[i].id = facility(fa_name, 1);
     }
 
-    // Allocanto e definindo vetor 'state' para cada nodo.
+    // Allocanto e definindo valor inicial 0 em entradas vetor 'state' de cada nodo.
     for(i = 0; i < N; i++){
         nodo[i].state = (int *) malloc(N * sizeof(int));
-        memset(nodo[i].state, -1, N * sizeof(int));
-        nodo[i].state[i] = 0;
+        memset(nodo[i].state, 0, N * sizeof(int));
     }
 
     // Escalonando testes para todos os nodos executarem no tempo 30.
@@ -79,16 +83,8 @@ int main (int argc, char *argv[]){
         schedule(TEST, 30.0, i);
     }
 
-    schedule(FAULT, 0.0, 1);   // O processo 1 falha no tempo 0.
-    schedule(REPAIR, 31.0, 1);  // O processo 1 recupera no tempo 31.
-
-    // Escalonando todos os nodos, exceto o nodo 0 para falharem em tempo 40 até 70.
-    for(i = 1; i < N; i++){
-        schedule(FAULT, 40.0, i);   
-        schedule(REPAIR, 70.0, i);
-    }
-
-
+    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 31.
+    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 61.
 
     // Loop de simulação.
     while(time() < T_SIMULACAO){
@@ -103,21 +99,45 @@ int main (int argc, char *argv[]){
 
                 // Calcula id de primeiro nodo que será testado por nodo atual e atualiza entrada de state de nodo 'next'.
                 next = (token + 1) % N;
-                nodo[token].state[next] = status(nodo[next].id);
                 
+                // Zera a contagem de nodos testados. 
+                nodo_counter = 0;
+
                 // Equanto nodo indicado por 'next' não estiver correto e não for o nodo atual (token)
                 while(status(nodo[next].id) && (next != token)){
 
+                    // incrementa o contador de nodos testados.
+                    nodo_counter ++;
+
                     // Imprime que nodo 'next' esta FALHO.
                     printf("[%3.1f] O nodo [%d] testa o nodo [%d] FALHO.\n", time(), token, next);
+
+                    // Caso anteriormente nodo 'next' estivesse CORRETO, incrementar a sua entrada em vetor 'state'.
+                    if((nodo[token].state[next] % 2) == 0){
+                        nodo[token].state[next] ++;
+                    }
 
                     // Calcula id nodo próximo a 'next' e atualiza entrada de state de nodo 'next'.
                     next = (next + 1) % N;
                     nodo[token].state[next] = status(nodo[next].id);
                 }
 
+                // Caso 'next' indique um nodo correto diferente de nodo testador (token ).
                 if(next != token){
                     printf("[%3.1f] O nodo [%d] testa o nodo [%d] CORRETO.\n", time(), token, next);
+
+                    // Caso anteriormente nodo 'next' estivesse FALHO, incrementar a sua entrada em vetor 'state'.
+                    if((nodo[token].state[next] % 2) == 1){
+                        nodo[token].state[next] += 1;
+                    }
+                    nodo_counter ++;
+                    
+                    // Transferindo nodos não testados ( N - nodo_counter ) a partir de nodo 'next', de vetor 'state' de nodo 'next' para 'state' de nodo 'token'.
+                    for(i = 1; i < (N - nodo_counter); i++){
+
+                        printf("\tRecuperando estado de nodo [%d] de vector state de nodo [%d].\n", (next + i) % N, next);
+                        nodo[token].state[(next + i) % N] = nodo[next].state[(next + i) % N];
+                    }
                 }
                 else{
                     printf("[%3.1f] O nodo [%d] não encontrou nenhum outro nodo correto.\n", time(), token);

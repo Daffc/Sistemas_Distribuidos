@@ -1,0 +1,65 @@
+Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 4.
+Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.
+Este Programa foi executado com N=4 Processos.
+[30.0] O nodo [0] testa o nodo [1] CORRETO.
+	Recuperando estado de nodo [2] de vector state de nodo [1].
+	Recuperando estado de nodo [3] de vector state de nodo [1].
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 0; [2] = 0; [3] = 0; 
+[30.0] O nodo [1] testa o nodo [2] CORRETO.
+	Recuperando estado de nodo [3] de vector state de nodo [2].
+	Recuperando estado de nodo [0] de vector state de nodo [2].
+	Vetor 'state' de nodo [1]:
+	[0] = 0; [1] = 0; [2] = 0; [3] = 0; 
+[30.0] O nodo [2] testa o nodo [3] CORRETO.
+	Recuperando estado de nodo [0] de vector state de nodo [3].
+	Recuperando estado de nodo [1] de vector state de nodo [3].
+	Vetor 'state' de nodo [2]:
+	[0] = 0; [1] = 0; [2] = 0; [3] = 0; 
+[30.0] O nodo [3] testa o nodo [0] CORRETO.
+	Recuperando estado de nodo [1] de vector state de nodo [0].
+	Recuperando estado de nodo [2] de vector state de nodo [0].
+	Vetor 'state' de nodo [3]:
+	[0] = 0; [1] = 0; [2] = 0; [3] = 0; 
+[31.0] O nodo [1] falhou.
+[60.0] O nodo [0] testa o nodo [1] FALHO.
+[60.0] O nodo [0] testa o nodo [2] CORRETO.
+	Recuperando estado de nodo [3] de vector state de nodo [2].
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 1; [2] = 0; [3] = 0; 
+[60.0] O nodo [2] testa o nodo [3] CORRETO.
+	Recuperando estado de nodo [0] de vector state de nodo [3].
+	Recuperando estado de nodo [1] de vector state de nodo [3].
+	Vetor 'state' de nodo [2]:
+	[0] = 0; [1] = 0; [2] = 0; [3] = 0; 
+[60.0] O nodo [3] testa o nodo [0] CORRETO.
+	Recuperando estado de nodo [1] de vector state de nodo [0].
+	Recuperando estado de nodo [2] de vector state de nodo [0].
+	Vetor 'state' de nodo [3]:
+	[0] = 0; [1] = 1; [2] = 0; [3] = 0; 
+[61.0] O nodo [1] recuperou.
+[90.0] O nodo [0] testa o nodo [1] CORRETO.
+	Recuperando estado de nodo [2] de vector state de nodo [1].
+	Recuperando estado de nodo [3] de vector state de nodo [1].
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 2; [2] = 0; [3] = 0; 
+[90.0] O nodo [2] testa o nodo [3] CORRETO.
+	Recuperando estado de nodo [0] de vector state de nodo [3].
+	Recuperando estado de nodo [1] de vector state de nodo [3].
+	Vetor 'state' de nodo [2]:
+	[0] = 0; [1] = 1; [2] = 0; [3] = 0; 
+[90.0] O nodo [3] testa o nodo [0] CORRETO.
+	Recuperando estado de nodo [1] de vector state de nodo [0].
+	Recuperando estado de nodo [2] de vector state de nodo [0].
+	Vetor 'state' de nodo [3]:
+	[0] = 0; [1] = 2; [2] = 0; [3] = 0; 
+[91.0] O nodo [1] testa o nodo [2] CORRETO.
+	Recuperando estado de nodo [3] de vector state de nodo [2].
+	Recuperando estado de nodo [0] de vector state de nodo [2].
+	Vetor 'state' de nodo [1]:
+	[0] = 0; [1] = 0; [2] = 0; [3] = 0; 
+[120.0] O nodo [0] testa o nodo [1] CORRETO.
+	Recuperando estado de nodo [2] de vector state de nodo [1].
+	Recuperando estado de nodo [3] de vector state de nodo [1].
+	Vetor 'state' de nodo [0]:
+	[0] = 0; [1] = 2; [2] = 0; [3] = 0; 

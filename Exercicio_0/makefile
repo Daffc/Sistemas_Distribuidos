@@ -1,15 +1,15 @@
-all: tempo
+all: tarefa_0
 
-tempo: tempo.o ../libs/smpl.o ../libs/rand.o
+tarefa_0: tarefa_0.o ../libs/smpl.o ../libs/rand.o
 	$(MAKE) -C ../libs
-	$(LINK.c) -o $@ -Bstatic tempo.o ../libs/smpl.o ../libs/rand.o -lm
+	$(LINK.c) -o $@ -Bstatic tarefa_0.o ../libs/smpl.o ../libs/rand.o -lm
 
-tempo.o: tempo.c ../libs/smpl.h
-	$(COMPILE.c) -g  tempo.c
+tarefa_0.o: tarefa_0.c ../libs/smpl.h
+	$(COMPILE.c) -g  tarefa_0.c
 
 clean:
-	$(RM) *.o tempo relat saida
+	$(RM) *.o tarefa_0 relat saida
 
 purge:
 	$(MAKE) clean -C ../libs
-	$(RM) *.o tempo relat saida
+	$(RM) *.o tarefa_0 relat saida

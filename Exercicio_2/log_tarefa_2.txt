@@ -1,0 +1,24 @@
+Sistemas Distribuidos 2021/ERE4: Trabalho Prático 0, Tarefa 2.
+Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.
+Este Programa foi executado com N=4 Processos.
+[0.0] O nodo [1] falhou.
+[30.0] O nodo [0] testa o nodo [1] FALHO.
+[30.0] O nodo [0] testa o nodo [2] CORRETO.
+[30.0] O nodo [2] testa o nodo [3] CORRETO.
+[30.0] O nodo [3] testa o nodo [0] CORRETO.
+[31.0] O nodo [1] recuperou.
+[40.0] O nodo [1] falhou.
+[40.0] O nodo [2] falhou.
+[40.0] O nodo [3] falhou.
+[60.0] O nodo [0] testa o nodo [1] FALHO.
+[60.0] O nodo [0] testa o nodo [2] FALHO.
+[60.0] O nodo [0] testa o nodo [3] FALHO.
+[60.0] O nodo [0] não encontrou nenhum outro nodo correto.
+[70.0] O nodo [1] recuperou.
+[70.0] O nodo [2] recuperou.
+[70.0] O nodo [3] recuperou.
+[90.0] O nodo [0] testa o nodo [1] CORRETO.
+[100.0] O nodo [1] testa o nodo [2] CORRETO.
+[100.0] O nodo [2] testa o nodo [3] CORRETO.
+[100.0] O nodo [3] testa o nodo [0] CORRETO.
+[120.0] O nodo [0] testa o nodo [1] CORRETO.
