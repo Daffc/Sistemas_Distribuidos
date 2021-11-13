@@ -1,3 +1,12 @@
+/*
+    Header File: 
+        Arquivo utilizado pelo programa 'trabPrat.c', nele estão discritas a estrutura 'node_set' e função 'cisj', 
+		utilizada para definir ordem de nodos clusters de testes / testadores de acordo com lógica VCube para teste e  diagnóstico.
+
+    Autor: Douglas Affonso Clementino
+    Data da última modificação: 29/10/2021
+*/
+
 #ifndef __CISJ__
 
 	#define __CISJ__

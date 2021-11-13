@@ -1,3 +1,13 @@
+
+/*
+    Biblioteca: 
+        Arquivo utilizado pelo programa 'trabPrat.c', nele estão discritas funções para definir ordem de nodos clusters de testes / testadores 
+		de acordo com lógica VCube para teste e  diagnóstico.
+
+    Modificado por: Douglas Affonso Clementino
+    Data da última modificação: 29/10/2021
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

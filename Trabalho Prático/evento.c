@@ -1,3 +1,12 @@
+/*
+    Biblioteca: 
+        Arquivo utilizado pelo programa 'trabPrat.c', nele estão discritas funções que auxiliam no 
+        processo de identificação de um nodo evento assim como informações sobre o seu diagnóstico.
+
+    Autor: Douglas Affonso Clementino
+    Data da última modificação: 29/10/2021
+*/
+
 #include "nodo.h"
 #include "evento.h"
 #include "smpl.h"
@@ -53,31 +62,6 @@ void identificaEvento(int n_testador, int n_testado, int tipo_evento, tevento *e
         
     }
 
-}
-
-// Imprime estrutura evento e seus componentes.
-void imprimeEventoTeste(tevento *evento, int qnt_nodos){
-    int i;
-    printf("\t******************************\n");
-    printf("\t*EVENTO:\n");
-    printf("\t*\tnodo: %d\n", evento->nodo);
-    printf("\t*\ttipo: %d\n", evento->tipo);
-    printf("\t*\tdiagnosticando: %d\n", evento->diagnosticando);
-    printf("\t*\tcout_rodada: %d\n", evento->cout_rodada);
-    printf("\t*\tcout_testes: %d\n", evento->cout_testes);
-    printf("\t*\tt_inicio: %3.1f\n", evento->t_inicio);
-    printf("\t*\tt_fim: %3.1f\n", evento->t_fim);
-    printf("\t*\talertados: ");
-    for(i = 0; i < qnt_nodos; i++){
-        printf("%d ", evento->alertados[i]);
-    }
-    printf("\n");
-    printf("\t*\trodada_completa: ");
-    for(i = 0; i < qnt_nodos; i++){
-        printf("%d ", evento->rodada_completa[i]);
-    }
-    printf("\n");
-    printf("\t******************************\n");
 }
 
 // Inicializa valores para novo evento do tipo 'tipo' sofrido pelo nodo 'id'.

@@ -26,7 +26,7 @@
 
 
         Autor: Douglas Affonso Clementino
-        Data da última modificação: 25/10/2021
+        Data da última modificação: 12/11/2021
 */
 
 #include <stdio.h>
@@ -161,8 +161,8 @@ void testarNodo(tnodo *nodo, int n_testador, int n_testado, int qnt_nodos, teven
 
 // Define Agendamento de eventos da simualação.
 void agendarEventos(){
-    schedule(FAULT, 31.0, 3);   // O processo 1 falha no tempo 0.
-    // schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
+    schedule(FAULT, 31.0, 1);   // O processo 1 falha no tempo 31.0.
+    schedule(REPAIR, 61.0, 1);  // O processo 1 recupera no tempo 31.
 }
 
 // Imprime informações dos nodos antes de iniciar simulação.
@@ -179,6 +179,7 @@ void imprimeInicializacao(tnodo *nodo, int qnt_nodos){
         for(j = 0; j < nodo[i].qnt_testes - 1; j++){
             printf("%d, ", nodo[i].testes[j]);
         }
+        printf("%d}\n", nodo[i].testes[j]);
         printf("\t\tVector State: {");
         for(j = 0; j < qnt_nodos - 1; j++){
             printf("%d, ", nodo[i].state[j]);
@@ -217,7 +218,7 @@ int main (int argc, char *argv[]){
     // Imprimindo header de log.
     printf(
         "Sistemas Distribuidos 2021/ERE4: TRABALHO PRÁTICO.\n"
-        "Autor: Douglas Affonso Clementino. *Data da última alteração 29/10/2021.\n"
+        "Autor: Douglas Affonso Clementino. *Data da última alteração 12/11/2021.\n"
         "Este Programa foi executado com N=%d Processos.\n"
         "\n\n",
         N
@@ -277,8 +278,8 @@ int main (int argc, char *argv[]){
 
                 // Nodo "token" testará "qnt_testes" de acordo com indicado em seu vetor de testes "testes".
                 for(i = 0; i < nodo[token].qnt_testes; i++){
-                    testarNodo(nodo, token, nodo[token].testes[i], N, &evento); 
                     evento.cout_testes ++;  // Contabiliza teste em estrutura evento.
+                    testarNodo(nodo, token, nodo[token].testes[i], N, &evento); 
                 }
 
                 // Caso 'evento' esteja sendo diagnosticado.
@@ -286,8 +287,6 @@ int main (int argc, char *argv[]){
                     // Atualiza entrada de nodo 'token' em vetor 'rodada_completa', indicando que em rodada atual, vetor token já efetuou todos os testes.
                     evento.rodada_completa[token] = 1;
                     verificaRodadaCompleta(&evento, nodo, N);
-                    // imprimeEventoTeste(&evento, N);     //DEBUG:
-
                 }
                 
                 imprimeVectorState(nodo, token, N);

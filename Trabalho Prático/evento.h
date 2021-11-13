@@ -1,3 +1,12 @@
+/*
+    Header File: 
+        Arquivo utilizado pelo programa 'trabPrat.c', nele estão discritas a estrutura 'tevento' 
+        utilizada para identificação de eventos e controle de seus diagnosticos, assim como as funções que auxiliam este processo..
+
+    Autor: Douglas Affonso Clementino
+    Data da última modificação: 29/10/2021
+*/
+
 #ifndef __EVENTO__
     #define __EVENTO__
 
@@ -25,9 +34,6 @@
 
     // Verifica se 'n_testado' é o nodo relacionado a 'evento' e se o evento 'tipo_evento' é do mesmo tipo que 'evento', caso positivo, indicando em 'evento' que nodo 'n_testado' esta ciente do evento e verifica se o diagnostico foi completo.
     void identificaEvento(int n_testador, int n_testado, int tipo_evento, tevento *evento, int qnt_nodos);
-
-    // Imprime estrutura evento e seus componentes.
-    void imprimeEventoTeste(tevento *evento, int qnt_nodos);
 
     // Inicializa valores para novo evento do tipo 'tipo' sofrido pelo nodo 'id'.
     void inicializaNovoEvento(tnodo *nodo, tevento *evento, int qnt_nodos, int id, int tipo);

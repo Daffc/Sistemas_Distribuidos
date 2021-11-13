@@ -1,4 +1,12 @@
 
+/*
+    Header File: 
+        Arquivo utilizado pelo programa 'trabPrat.c', nele estão discritas a estrutura 'tnodo' e macros relacionadas ao controle dos nodos.
+
+    Autor: Douglas Affonso Clementino
+    Data da última modificação: 29/10/2021
+*/
+
 #ifndef __NODO__
     #define __NODO__
 

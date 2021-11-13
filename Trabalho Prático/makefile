@@ -1,10 +1,13 @@
-all: smpl.o rand.o cisj.o tempo
+# Autor: Douglas Affonso Clementino
+# Data da última modificação: 12/11/2021
 
-tempo: tempo.o smpl.o rand.o cisj.o evento.o 
-	$(LINK.c) -o $@ -Bstatic tempo.o smpl.o rand.o cisj.o evento.o -lm
+all: smpl.o rand.o cisj.o trabPrat
 
-tempo.o: tempo.c smpl.h cisj.h nodo.h evento.h
-	$(COMPILE.c) -g  tempo.c
+trabPrat: trabPrat.o smpl.o rand.o cisj.o evento.o 
+	$(LINK.c) -o $@ -Bstatic trabPrat.o smpl.o rand.o cisj.o evento.o -lm
+
+trabPrat.o: trabPrat.c smpl.h cisj.h nodo.h evento.h
+	$(COMPILE.c) -g  trabPrat.c
 
 smpl.o: smpl.c smpl.h
 	$(COMPILE.c)  -g smpl.c
@@ -22,4 +25,4 @@ clean:
 	$(RM) *.o
 
 purge: clean	
-	$(RM) tempo relat saida
+	$(RM) trabPrat relat saida
